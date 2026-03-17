@@ -1,11 +1,161 @@
 {
   "repo": "youxch/ARIA",
   "created": "2026-03-17T00:00:00+00:00",
-  "daily_views": [],
-  "daily_clones": [],
-  "snapshots": [],
-  "total_views": 0,
-  "total_uniques": 0,
-  "total_clones": 0,
-  "last_updated": "2026-03-17T00:00:00+00:00"
+  "daily_views": [
+    {
+      "date": "2026-03-03",
+      "count": 0,
+      "uniques": 0
+    },
+    {
+      "date": "2026-03-04",
+      "count": 0,
+      "uniques": 0
+    },
+    {
+      "date": "2026-03-05",
+      "count": 0,
+      "uniques": 0
+    },
+    {
+      "date": "2026-03-06",
+      "count": 0,
+      "uniques": 0
+    },
+    {
+      "date": "2026-03-07",
+      "count": 0,
+      "uniques": 0
+    },
+    {
+      "date": "2026-03-08",
+      "count": 0,
+      "uniques": 0
+    },
+    {
+      "date": "2026-03-09",
+      "count": 0,
+      "uniques": 0
+    },
+    {
+      "date": "2026-03-10",
+      "count": 0,
+      "uniques": 0
+    },
+    {
+      "date": "2026-03-11",
+      "count": 0,
+      "uniques": 0
+    },
+    {
+      "date": "2026-03-12",
+      "count": 0,
+      "uniques": 0
+    },
+    {
+      "date": "2026-03-13",
+      "count": 0,
+      "uniques": 0
+    },
+    {
+      "date": "2026-03-14",
+      "count": 0,
+      "uniques": 0
+    },
+    {
+      "date": "2026-03-15",
+      "count": 3,
+      "uniques": 2
+    },
+    {
+      "date": "2026-03-16",
+      "count": 94,
+      "uniques": 12
+    }
+  ],
+  "daily_clones": [
+    {
+      "date": "2026-03-03",
+      "count": 0,
+      "uniques": 0
+    },
+    {
+      "date": "2026-03-04",
+      "count": 0,
+      "uniques": 0
+    },
+    {
+      "date": "2026-03-05",
+      "count": 0,
+      "uniques": 0
+    },
+    {
+      "date": "2026-03-06",
+      "count": 0,
+      "uniques": 0
+    },
+    {
+      "date": "2026-03-07",
+      "count": 0,
+      "uniques": 0
+    },
+    {
+      "date": "2026-03-08",
+      "count": 0,
+      "uniques": 0
+    },
+    {
+      "date": "2026-03-09",
+      "count": 0,
+      "uniques": 0
+    },
+    {
+      "date": "2026-03-10",
+      "count": 0,
+      "uniques": 0
+    },
+    {
+      "date": "2026-03-11",
+      "count": 0,
+      "uniques": 0
+    },
+    {
+      "date": "2026-03-12",
+      "count": 0,
+      "uniques": 0
+    },
+    {
+      "date": "2026-03-13",
+      "count": 0,
+      "uniques": 0
+    },
+    {
+      "date": "2026-03-14",
+      "count": 0,
+      "uniques": 0
+    },
+    {
+      "date": "2026-03-15",
+      "count": 0,
+      "uniques": 0
+    },
+    {
+      "date": "2026-03-16",
+      "count": 57,
+      "uniques": 37
+    }
+  ],
+  "snapshots": [
+    {
+      "timestamp": "2026-03-17T12:53:34.152034+00:00",
+      "stars": 2,
+      "forks": 0,
+      "watchers": 0,
+      "open_issues": 0
+    }
+  ],
+  "total_views": 97,
+  "total_uniques": 14,
+  "total_clones": 57,
+  "last_updated": "2026-03-17T12:53:34.152086+00:00"
 }
