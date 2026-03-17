@@ -1,0 +1,35 @@
+name: Collect Traffic Stats
+
+on:
+  schedule:
+    - cron: '0 2 * * *'   # 每天北京时间 10:00 运行
+  workflow_dispatch:        # 允许手动触发
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Collect traffic data
+        env:
+          GH_TOKEN: ${{ secrets.TRAFFIC_TOKEN }}
+          GH_REPO:  ${{ github.repository }}
+        run: python scripts/collect_traffic.py
+
+      - name: Commit updated stats
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add traffic/stats.json
+          git diff --cached --quiet || git commit -m "chore: update traffic stats [skip ci]"
+          git push
