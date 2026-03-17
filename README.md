@@ -1,8 +1,9 @@
 <div align="center">
 
-<img src="https://readme-typing-svg.demolab.com?font=Inter&weight=800&size=48&duration=3000&pause=1000&color=38BDF8&center=true&vCenter=true&width=500&lines=📡+ARIA;Antenna+AI+%E5%A4%A9%E7%BA%BF+AI" alt="ARIA" />
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0ea5e9,50:6366f1,100:c084fc&height=200&section=header&text=ARIA&fontSize=80&fontColor=ffffff&fontAlignY=38&desc=Antenna+Resonance+Intelligence+Architect&descAlignY=58&descSize=18&animation=fadeIn" width="100%"/>
 
-### Antenna Resonance Intelligence Architect
+<br/>
+
 ### 天线谐振智能设计师
 
 **用自然语言描述你的天线，让 AI 完成剩下的一切**
