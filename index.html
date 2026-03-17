@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARIA — Antenna Resonance Intelligence Architect</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- 不蒜子 · 静态站点访问统计 -->
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg-deep: #050d1a;
+    --bg-mid: #0a1628;
+    --cyan: #00d2ff;
+    --cyan-dim: rgba(0,210,255,0.15);
+    --cyan-glow: rgba(0,210,255,0.4);
+    --purple: #7c3aed;
+    --purple-dim: rgba(124,58,237,0.15);
+    --orange: #f97316;
+    --orange-dim: rgba(249,115,22,0.15);
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --text-dim: #475569;
+    --glass: rgba(255,255,255,0.03);
+    --glass-border: rgba(255,255,255,0.08);
+    --card-bg: rgba(10,22,40,0.7);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-deep);
+    color: var(--text);
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  /* ───────────────── SCROLLBAR ───────────────── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg-deep); }
+  ::-webkit-scrollbar-thumb { background: var(--purple); border-radius: 3px; }
+
+  /* ───────────────── NAV ───────────────── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 2rem;
+    height: 64px;
+    background: rgba(5,13,26,0.8);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--glass-border);
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 0.6rem;
+    font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .nav-logo span { font-size: 1.4rem; -webkit-text-fill-color: initial; }
+  .nav-right { display: flex; align-items: center; gap: 1rem; }
+  .btn-ghost-sm {
+    display: flex; align-items: center; gap: 0.4rem;
+    padding: 0.45rem 1rem;
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    background: var(--glass);
+    color: var(--text-muted);
+    font-size: 0.85rem; font-weight: 500;
+    cursor: pointer; text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-ghost-sm:hover { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-dim); }
+
+  /* ───────────────── HERO ───────────────── */
+  #hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    overflow: hidden;
+    padding: 80px 2rem 0;
+  }
+  #waveCanvas {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+  }
+  .hero-content {
+    position: relative; z-index: 2;
+    text-align: center;
+    max-width: 900px;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.35rem 1rem;
+    border: 1px solid rgba(0,210,255,0.3);
+    border-radius: 100px;
+    background: rgba(0,210,255,0.05);
+    font-size: 0.8rem; font-weight: 500; color: var(--cyan);
+    margin-bottom: 2rem;
+    letter-spacing: 0.05em;
+  }
+  .hero-badge::before { content: ''; width: 6px; height: 6px; background: var(--cyan); border-radius: 50%; animation: pulse-dot 2s infinite; }
+  @keyframes pulse-dot { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+  .hero-title {
+    font-size: clamp(5rem, 18vw, 12rem);
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 0.9;
+    background: linear-gradient(135deg, var(--cyan) 0%, #a78bfa 50%, var(--purple) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+    filter: drop-shadow(0 0 60px rgba(0,210,255,0.3));
+  }
+  .hero-subtitle {
+    font-size: clamp(1rem, 2.5vw, 1.4rem);
+    font-weight: 400;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+  }
+  .hero-cn {
+    font-size: clamp(1.1rem, 2vw, 1.3rem);
+    font-weight: 300;
+    color: rgba(226,232,240,0.5);
+    margin-bottom: 0.5rem;
+  }
+  .hero-tagline {
+    font-size: clamp(0.9rem, 1.8vw, 1.1rem);
+    color: var(--text-muted);
+    margin-bottom: 2.5rem;
+    font-style: italic;
+  }
+  .hero-cta {
+    display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+    margin-bottom: 2rem;
+  }
+  .btn-primary {
+    position: relative;
+    padding: 0.85rem 2rem;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, var(--cyan), #0099cc);
+    color: #000;
+    font-size: 1rem; font-weight: 700;
+    cursor: pointer; text-decoration: none;
+    transition: all 0.25s;
+    box-shadow: 0 0 30px rgba(0,210,255,0.3);
+    animation: glow-pulse 3s ease-in-out infinite;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 50px rgba(0,210,255,0.6); }
+  @keyframes glow-pulse {
+    0%,100%{ box-shadow: 0 0 30px rgba(0,210,255,0.3); }
+    50%{ box-shadow: 0 0 50px rgba(0,210,255,0.55), 0 0 80px rgba(0,210,255,0.2); }
+  }
+  .btn-ghost {
+    padding: 0.85rem 2rem;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    background: rgba(255,255,255,0.04);
+    color: var(--text);
+    font-size: 1rem; font-weight: 600;
+    cursor: pointer; text-decoration: none;
+    backdrop-filter: blur(10px);
+    transition: all 0.25s;
+  }
+  .btn-ghost:hover { border-color: var(--purple); color: #a78bfa; background: var(--purple-dim); transform: translateY(-2px); }
+
+  .hero-creator {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    margin-bottom: 0;
+  }
+  .hero-creator strong { color: var(--text-muted); font-weight: 600; }
+
+  /* S11 Hero SVG */
+  .hero-s11 {
+    position: relative; z-index: 2;
+    width: 100%; max-width: 800px;
+    margin-top: 3rem;
+  }
+  .s11-hero-svg { width: 100%; height: auto; }
+
+  /* ───────────────── SECTION COMMON ───────────────── */
+  section { padding: 7rem 2rem; }
+  .section-inner { max-width: 1100px; margin: 0 auto; }
+  .section-label {
+    display: inline-block;
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--cyan);
+    margin-bottom: 0.75rem;
+  }
+  .section-title {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 800; letter-spacing: -0.02em;
+    color: var(--text);
+    line-height: 1.15;
+    margin-bottom: 1rem;
+  }
+  .section-desc {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    max-width: 600px;
+    margin-bottom: 3rem;
+  }
+
+  /* ───────────────── FEATURES ───────────────── */
+  #features { background: linear-gradient(180deg, var(--bg-deep) 0%, #070f1f 100%); }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+  .feat-card {
+    position: relative;
+    padding: 2rem;
+    border-radius: 20px;
+    border: 1px solid var(--glass-border);
+    background: var(--card-bg);
+    backdrop-filter: blur(16px);
+    transition: all 0.35s cubic-bezier(.25,.46,.45,.94);
+    overflow: hidden;
+  }
+  .feat-card::before {
+    content: '';
+    position: absolute; inset: 0;
+    border-radius: 20px;
+    opacity: 0;
+    transition: opacity 0.35s;
+    pointer-events: none;
+  }
+  .feat-card:nth-child(1)::before { background: radial-gradient(circle at 30% 30%, rgba(0,210,255,0.08), transparent 70%); }
+  .feat-card:nth-child(2)::before { background: radial-gradient(circle at 30% 30%, rgba(124,58,237,0.08), transparent 70%); }
+  .feat-card:nth-child(3)::before { background: radial-gradient(circle at 30% 30%, rgba(249,115,22,0.08), transparent 70%); }
+  .feat-card:hover { transform: translateY(-6px) scale(1.01); }
+  .feat-card:nth-child(1):hover { border-color: rgba(0,210,255,0.4); box-shadow: 0 20px 60px rgba(0,210,255,0.1), 0 0 0 1px rgba(0,210,255,0.15); }
+  .feat-card:nth-child(2):hover { border-color: rgba(124,58,237,0.4); box-shadow: 0 20px 60px rgba(124,58,237,0.1), 0 0 0 1px rgba(124,58,237,0.15); }
+  .feat-card:nth-child(3):hover { border-color: rgba(249,115,22,0.4); box-shadow: 0 20px 60px rgba(249,115,22,0.1), 0 0 0 1px rgba(249,115,22,0.15); }
+  .feat-card:hover::before { opacity: 1; }
+
+  .feat-icon {
+    font-size: 2rem; margin-bottom: 1.2rem;
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 3.5rem; height: 3.5rem;
+    border-radius: 14px;
+  }
+  .feat-card:nth-child(1) .feat-icon { background: rgba(0,210,255,0.1); }
+  .feat-card:nth-child(2) .feat-icon { background: rgba(124,58,237,0.1); }
+  .feat-card:nth-child(3) .feat-icon { background: rgba(249,115,22,0.1); }
+
+  .feat-name { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.75rem; }
+  .feat-card:nth-child(1) .feat-name { color: var(--cyan); }
+  .feat-card:nth-child(2) .feat-name { color: #a78bfa; }
+  .feat-card:nth-child(3) .feat-name { color: var(--orange); }
+
+  .feat-desc { font-size: 0.92rem; color: var(--text-muted); line-height: 1.7; }
+  .feat-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 1.2rem; }
+  .feat-tag {
+    font-size: 0.72rem; font-weight: 500; letter-spacing: 0.05em;
+    padding: 0.2rem 0.6rem; border-radius: 100px;
+  }
+  .feat-card:nth-child(1) .feat-tag { background: rgba(0,210,255,0.1); color: var(--cyan); border: 1px solid rgba(0,210,255,0.2); }
+  .feat-card:nth-child(2) .feat-tag { background: rgba(124,58,237,0.1); color: #a78bfa; border: 1px solid rgba(124,58,237,0.2); }
+  .feat-card:nth-child(3) .feat-tag { background: rgba(249,115,22,0.1); color: var(--orange); border: 1px solid rgba(249,115,22,0.2); }
+
+  /* ───────────────── HOW IT WORKS ───────────────── */
+  #how {
+    background: linear-gradient(180deg, #070f1f 0%, #060e1c 100%);
+    position: relative; overflow: hidden;
+  }
+  #how::before {
+    content: ''; position: absolute;
+    top: 50%; left: 50%; transform: translate(-50%,-50%);
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(124,58,237,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .steps-row {
+    display: flex; align-items: flex-start; gap: 0;
+    flex-wrap: wrap; justify-content: center;
+    position: relative;
+  }
+  .step-item {
+    display: flex; flex-direction: column; align-items: center;
+    text-align: center; flex: 1; min-width: 130px; max-width: 180px;
+    position: relative;
+    padding: 0 0.5rem;
+  }
+  .step-num-wrap {
+    position: relative; margin-bottom: 1rem;
+    display: flex; align-items: center;
+  }
+  .step-circle {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    border: 2px solid var(--glass-border);
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem;
+    transition: all 0.3s;
+    position: relative; z-index: 1;
+  }
+  .step-item:hover .step-circle {
+    border-color: var(--cyan);
+    box-shadow: 0 0 30px rgba(0,210,255,0.3);
+    transform: scale(1.1);
+  }
+  .step-arrow {
+    position: absolute; left: calc(50% + 32px); top: 50%;
+    transform: translateY(-50%);
+    width: calc(100% - 64px);
+    height: 2px;
+    background: linear-gradient(90deg, rgba(0,210,255,0.4), rgba(124,58,237,0.4));
+    z-index: 0;
+  }
+  .step-arrow::after {
+    content: ''; position: absolute; right: -1px; top: 50%; transform: translateY(-50%);
+    border: 5px solid transparent;
+    border-left-color: rgba(124,58,237,0.6);
+    border-right-width: 0;
+  }
+  .step-item:last-child .step-arrow { display: none; }
+  .step-label { font-size: 0.82rem; font-weight: 600; color: var(--text-muted); line-height: 1.4; }
+  .step-sub { font-size: 0.72rem; color: var(--text-dim); margin-top: 0.25rem; }
+
+  /* ───────────────── S11 CHART ───────────────── */
+  #chart { background: linear-gradient(180deg, #060e1c 0%, #050d1a 100%); }
+  .chart-container {
+    background: rgba(10,22,40,0.8);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 2.5rem;
+    backdrop-filter: blur(20px);
+    position: relative;
+    overflow: hidden;
+  }
+  .chart-container::before {
+    content: ''; position: absolute;
+    top: -100px; right: -100px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(0,210,255,0.04), transparent 70%);
+    pointer-events: none;
+  }
+  .chart-title { font-size: 1rem; font-weight: 600; color: var(--text-muted); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
+  .chart-legend { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .legend-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; color: var(--text-muted); }
+  .legend-dot { width: 24px; height: 3px; border-radius: 2px; }
+  .s11-svg { width: 100%; height: auto; display: block; }
+
+  /* ───────────────── OPTIMIZER ───────────────── */
+  #optimizer { background: linear-gradient(180deg, #050d1a 0%, #070f1f 100%); }
+  .opt-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+  }
+  .opt-card {
+    padding: 1.75rem;
+    border-radius: 18px;
+    border: 1px solid var(--glass-border);
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    transition: all 0.3s;
+  }
+  .opt-card:hover { transform: translateY(-4px); }
+  .opt-card:nth-child(1):hover { border-color: rgba(0,210,255,0.35); box-shadow: 0 12px 40px rgba(0,210,255,0.08); }
+  .opt-card:nth-child(2):hover { border-color: rgba(124,58,237,0.35); box-shadow: 0 12px 40px rgba(124,58,237,0.08); }
+  .opt-card:nth-child(3):hover { border-color: rgba(249,115,22,0.35); box-shadow: 0 12px 40px rgba(249,115,22,0.08); }
+
+  .opt-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem; }
+  .opt-icon-wrap {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
+  }
+  .opt-card:nth-child(1) .opt-icon-wrap { background: rgba(0,210,255,0.1); }
+  .opt-card:nth-child(2) .opt-icon-wrap { background: rgba(124,58,237,0.1); }
+  .opt-card:nth-child(3) .opt-icon-wrap { background: rgba(249,115,22,0.1); }
+  .opt-name { font-size: 1.05rem; font-weight: 700; }
+  .opt-card:nth-child(1) .opt-name { color: var(--cyan); }
+  .opt-card:nth-child(2) .opt-name { color: #a78bfa; }
+  .opt-card:nth-child(3) .opt-name { color: var(--orange); }
+  .opt-sub { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.1rem; }
+
+  .opt-rows { display: flex; flex-direction: column; gap: 0.75rem; }
+  .opt-row { display: flex; justify-content: space-between; align-items: center; }
+  .opt-row-label { font-size: 0.82rem; color: var(--text-muted); }
+  .opt-row-val { font-size: 0.82rem; font-weight: 600; }
+  .opt-bar-wrap { width: 100%; height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; margin-top: 0.3rem; overflow: hidden; }
+  .opt-bar { height: 100%; border-radius: 2px; transition: width 1s ease; }
+  .opt-card:nth-child(1) .opt-bar { background: linear-gradient(90deg, var(--cyan), #0099cc); }
+  .opt-card:nth-child(2) .opt-bar { background: linear-gradient(90deg, var(--purple), #a78bfa); }
+  .opt-card:nth-child(3) .opt-bar { background: linear-gradient(90deg, var(--orange), #fb923c); }
+  .stars { color: #fbbf24; letter-spacing: -1px; }
+
+  /* ───────────────── QUICK START ───────────────── */
+  #quickstart { background: linear-gradient(180deg, #070f1f 0%, #050d1a 100%); }
+  .terminal {
+    background: #010810;
+    border: 1px solid rgba(0,210,255,0.15);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04);
+    max-width: 700px;
+  }
+  .terminal-bar {
+    padding: 0.9rem 1.2rem;
+    background: rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .t-dot { width: 12px; height: 12px; border-radius: 50%; }
+  .t-dot:nth-child(1) { background: #ff5f57; }
+  .t-dot:nth-child(2) { background: #febc2e; }
+  .t-dot:nth-child(3) { background: #28c840; }
+  .t-title { margin-left: 0.5rem; font-size: 0.78rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+  .terminal-body { padding: 1.75rem 1.5rem; min-height: 200px; }
+  .t-line { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.6rem; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; min-height: 1.5em; }
+  .t-prompt { color: var(--cyan); user-select: none; flex-shrink: 0; }
+  .t-cmd { color: #e2e8f0; }
+  .t-cursor {
+    display: inline-block; width: 2px; height: 1.1em;
+    background: var(--cyan); vertical-align: text-bottom;
+    animation: blink 1.1s step-start infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
+  .t-comment { color: #475569; }
+  .t-output { color: #64748b; font-size: 0.82rem; font-family: 'JetBrains Mono', monospace; margin-left: 1.5rem; margin-bottom: 0.4rem; }
+
+  /* ───────────────── FOOTER ───────────────── */
+  footer {
+    background: #030a14;
+    border-top: 1px solid var(--glass-border);
+    padding: 3rem 2rem;
+    text-align: center;
+  }
+  .footer-inner { max-width: 700px; margin: 0 auto; }
+  .footer-logo {
+    font-size: 1.5rem; font-weight: 800;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+  }
+  .footer-tagline { font-size: 0.9rem; color: var(--text-dim); margin-bottom: 1.5rem; }
+  .footer-links { display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 2rem; }
+  .footer-link {
+    display: flex; align-items: center; gap: 0.4rem;
+    color: var(--text-dim); text-decoration: none; font-size: 0.85rem;
+    transition: color 0.2s;
+  }
+  .footer-link:hover { color: var(--cyan); }
+  .footer-copy { font-size: 0.8rem; color: var(--text-dim); }
+  .footer-copy span { color: var(--text-muted); }
+
+  /* ───────────────── SCROLL REVEAL ───────────────── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+
+  /* ───────────────── DIVIDER ───────────────── */
+  .gradient-div {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,210,255,0.2), rgba(124,58,237,0.2), transparent);
+    margin: 0;
+  }
+
+  /* ───────────────── RESPONSIVE ───────────────── */
+  @media (max-width: 768px) {
+    nav { padding: 0 1rem; }
+    section { padding: 4rem 1.25rem; }
+    .steps-row { gap: 1rem; }
+    .step-arrow { display: none; }
+    .step-item { min-width: 100px; }
+    .chart-container { padding: 1.5rem 1rem; }
+    .terminal-body { padding: 1.25rem 1rem; }
+    .t-line { font-size: 0.78rem; }
+  }
+  @media (max-width: 480px) {
+    .hero-cta { flex-direction: column; align-items: center; }
+    .btn-primary, .btn-ghost { width: 100%; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ────────────────────────── NAV ────────────────────────── -->
+<nav>
+  <div class="nav-logo">
+    <span>📡</span> ARIA
+  </div>
+  <div class="nav-right">
+    <a href="#features" class="btn-ghost-sm">功能特性</a>
+    <a href="#quickstart" class="btn-ghost-sm">快速开始</a>
+    <a href="https://github.com/youxch/ARIA" class="btn-ghost-sm" target="_blank">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      GitHub
+    </a>
+    <!-- 导航栏访问量角标 -->
+    <span style="display:inline-flex;align-items:center;gap:.35rem;
+      background:rgba(0,210,255,.08);border:1px solid rgba(0,210,255,.2);
+      border-radius:999px;padding:.22rem .7rem;font-size:.72rem;color:#64748b;
+      font-weight:500;white-space:nowrap;">
+      👁
+      <span id="busuanzi_value_site_pv" style="color:#00d2ff;font-weight:700;">…</span>
+    </span>
+  </div>
+</nav>
+
+<!-- ────────────────────────── HERO ────────────────────────── -->
+<section id="hero">
+  <canvas id="waveCanvas"></canvas>
+
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span></span> v1.0 · CST Studio Suite 2022 · Claude AI
+    </div>
+    <h1 class="hero-title">ARIA</h1>
+    <p class="hero-subtitle">Antenna Resonance Intelligence Architect</p>
+    <p class="hero-cn">天线谐振智能设计师</p>
+    <p class="hero-tagline">"用自然语言描述你的天线，让 AI 完成剩下的一切"</p>
+    <div class="hero-cta">
+      <a href="#quickstart" class="btn-primary">🚀 立即体验</a>
+      <a href="#features" class="btn-ghost">📖 查看文档</a>
+    </div>
+    <p class="hero-creator">由 <strong>尤栖冲 (You Xichong)</strong> 创建</p>
+  </div>
+
+  <!-- Animated S11 hint curve -->
+  <div class="hero-s11">
+    <svg class="s11-hero-svg" viewBox="0 0 800 120" xmlns="http://www.w3.org/2000/svg" fill="none">
+      <defs>
+        <linearGradient id="hcg" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#00d2ff" stop-opacity="0"/>
+          <stop offset="30%" stop-color="#00d2ff"/>
+          <stop offset="70%" stop-color="#7c3aed"/>
+          <stop offset="100%" stop-color="#7c3aed" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <!-- threshold line -->
+      <line x1="0" y1="30" x2="800" y2="30" stroke="rgba(249,115,22,0.25)" stroke-width="1" stroke-dasharray="6,4"/>
+      <text x="8" y="26" font-size="10" fill="rgba(249,115,22,0.5)" font-family="JetBrains Mono,monospace">-10 dB</text>
+      <!-- curve -->
+      <path id="heroS11Path"
+        d="M0,20 C50,20 80,20 150,20 C200,20 220,22 260,24 C290,25 310,26 340,60 C360,85 370,100 400,110 C430,100 440,85 460,60 C490,26 510,25 540,24 C580,22 600,20 650,20 C700,20 750,20 800,20"
+        stroke="url(#hcg)" stroke-width="2.5" stroke-linecap="round"
+        style="stroke-dasharray:1200;stroke-dashoffset:1200"/>
+    </svg>
+  </div>
+</section>
+
+<div class="gradient-div"></div>
+
+<!-- ────────────────────────── FEATURES ────────────────────────── -->
+<section id="features">
+  <div class="section-inner">
+    <p class="section-label reveal">天线类型</p>
+    <h2 class="section-title reveal reveal-delay-1">三种智能天线设计模型</h2>
+    <p class="section-desc reveal reveal-delay-2">覆盖主流天线拓扑结构，从经典贴片到像素化自由形态，AI 自动选型并建模。</p>
+    <div class="features-grid">
+
+      <div class="feat-card reveal reveal-delay-1">
+        <div class="feat-icon">🟦</div>
+        <div class="feat-name">矩形贴片天线</div>
+        <div class="feat-desc">基于 Pozar 传输线模型智能初始化天线尺寸，自动计算最优嵌入馈电位移，支持贴片宽度、长度、基底厚度多参数联合优化。</div>
+        <div class="feat-tags">
+          <span class="feat-tag">Pozar 公式</span>
+          <span class="feat-tag">嵌入馈电</span>
+          <span class="feat-tag">宽带优化</span>
+          <span class="feat-tag">贝叶斯 GP</span>
+        </div>
+      </div>
+
+      <div class="feat-card reveal reveal-delay-2">
+        <div class="feat-icon">📶</div>
+        <div class="feat-name">半波振子天线</div>
+        <div class="feat-desc">自动以 0.235λ 初始化单臂长度，支持对称臂长度自适应调整与频段迁移，内置 50Ω 馈电匹配，收敛速度极快。</div>
+        <div class="feat-tags">
+          <span class="feat-tag">0.235λ 初始化</span>
+          <span class="feat-tag">对称结构</span>
+          <span class="feat-tag">宽带 PSO</span>
+          <span class="feat-tag">快速收敛</span>
+        </div>
+      </div>
+
+      <div class="feat-card reveal reveal-delay-3">
+        <div class="feat-icon">🔲</div>
+        <div class="feat-name">像素化贴片天线</div>
+        <div class="feat-desc">N×M 二值像素网格定义天线形态，差分进化算法执行全局离散搜索，拓扑自由度极高，适合新型或不规则辐射结构探索。</div>
+        <div class="feat-tags">
+          <span class="feat-tag">N×M 像素网格</span>
+          <span class="feat-tag">差分进化</span>
+          <span class="feat-tag">拓扑自由</span>
+          <span class="feat-tag">全局搜索</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="gradient-div"></div>
+
+<!-- ────────────────────────── HOW IT WORKS ────────────────────────── -->
+<section id="how">
+  <div class="section-inner">
+    <p class="section-label reveal">工作流程</p>
+    <h2 class="section-title reveal reveal-delay-1">六步全自动设计管线</h2>
+    <p class="section-desc reveal reveal-delay-2">从自然语言到完整仿真报告，ARIA 全程自动化，无需手动建模。</p>
+    <div class="steps-row reveal reveal-delay-3">
+
+      <div class="step-item">
+        <div class="step-num-wrap">
+          <div class="step-circle">💬</div>
+          <div class="step-arrow"></div>
+        </div>
+        <div class="step-label">自然语言输入</div>
+        <div class="step-sub">描述你的需求</div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num-wrap">
+          <div class="step-circle">🧠</div>
+          <div class="step-arrow"></div>
+        </div>
+        <div class="step-label">AI 意图解析</div>
+        <div class="step-sub">Claude API 理解</div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num-wrap">
+          <div class="step-circle">📐</div>
+          <div class="step-arrow"></div>
+        </div>
+        <div class="step-label">几何建模</div>
+        <div class="step-sub">参数化构建</div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num-wrap">
+          <div class="step-circle">⚡</div>
+          <div class="step-arrow"></div>
+        </div>
+        <div class="step-label">CST 仿真</div>
+        <div class="step-sub">全波 EM 求解</div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num-wrap">
+          <div class="step-circle">🎯</div>
+          <div class="step-arrow"></div>
+        </div>
+        <div class="step-label">迭代优化</div>
+        <div class="step-sub">自动收敛</div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num-wrap">
+          <div class="step-circle">📊</div>
+        </div>
+        <div class="step-label">报告输出</div>
+        <div class="step-sub">中文分析报告</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="gradient-div"></div>
+
+<!-- ────────────────────────── S11 CHART ────────────────────────── -->
+<section id="chart">
+  <div class="section-inner">
+    <p class="section-label reveal">仿真结果</p>
+    <h2 class="section-title reveal reveal-delay-1">智能优化结果预览</h2>
+    <p class="section-desc reveal reveal-delay-2">三种天线类型在不同频段的 S11 优化结果对比，-10 dB 以下即为有效匹配带宽。</p>
+
+    <div class="chart-container reveal reveal-delay-3">
+      <div class="chart-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>
+        S11 Parameter (dB) vs Frequency (GHz)
+      </div>
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--cyan)"></div> 矩形贴片 (2.4 GHz)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div> 半波振子 (1.8 GHz)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#a78bfa"></div> 像素贴片 (5.8 GHz)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:rgba(249,115,22,0.5);background: repeating-linear-gradient(90deg,rgba(249,115,22,0.5) 0,rgba(249,115,22,0.5) 6px,transparent 6px,transparent 10px)"></div> -10 dB 阈值</div>
+      </div>
+      <svg id="s11Chart" class="s11-svg" viewBox="0 0 900 380" xmlns="http://www.w3.org/2000/svg" fill="none">
+        <defs>
+          <linearGradient id="gridFade" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="rgba(255,255,255,0.04)"/>
+            <stop offset="100%" stop-color="rgba(255,255,255,0.01)"/>
+          </linearGradient>
+          <!-- Glow filters -->
+          <filter id="glowCyan">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="glowOrange">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="glowPurple">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+
+        <!-- Chart background -->
+        <rect x="70" y="20" width="800" height="300" fill="url(#gridFade)" rx="4"/>
+
+        <!-- Grid lines horizontal -->
+        <line x1="70" y1="20"  x2="870" y2="20"  stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+        <line x1="70" y1="70"  x2="870" y2="70"  stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+        <line x1="70" y1="120" x2="870" y2="120" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+        <line x1="70" y1="170" x2="870" y2="170" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+        <line x1="70" y1="220" x2="870" y2="220" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+        <line x1="70" y1="270" x2="870" y2="270" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+        <line x1="70" y1="320" x2="870" y2="320" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+
+        <!-- -10 dB threshold line -->
+        <line x1="70" y1="170" x2="870" y2="170" stroke="rgba(249,115,22,0.45)" stroke-width="1.5" stroke-dasharray="8,5"/>
+        <text x="74" y="165" font-size="10" fill="rgba(249,115,22,0.7)" font-family="JetBrains Mono,monospace">-10 dB</text>
+
+        <!-- Grid lines vertical -->
+        <line x1="70"  y1="20" x2="70"  y2="320" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+        <line x1="230" y1="20" x2="230" y2="320" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+        <line x1="390" y1="20" x2="390" y2="320" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+        <line x1="550" y1="20" x2="550" y2="320" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+        <line x1="710" y1="20" x2="710" y2="320" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+        <line x1="870" y1="20" x2="870" y2="320" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+
+        <!-- Y axis labels (dB) -->
+        <text x="58" y="24"  font-size="10" fill="#475569" text-anchor="end" font-family="JetBrains Mono,monospace">0</text>
+        <text x="58" y="74"  font-size="10" fill="#475569" text-anchor="end" font-family="JetBrains Mono,monospace">-5</text>
+        <text x="58" y="124" font-size="10" fill="#475569" text-anchor="end" font-family="JetBrains Mono,monospace">-10</text>
+        <text x="58" y="174" font-size="10" fill="#475569" text-anchor="end" font-family="JetBrains Mono,monospace">-15</text>
+        <text x="58" y="224" font-size="10" fill="#475569" text-anchor="end" font-family="JetBrains Mono,monospace">-20</text>
+        <text x="58" y="274" font-size="10" fill="#475569" text-anchor="end" font-family="JetBrains Mono,monospace">-25</text>
+        <text x="58" y="324" font-size="10" fill="#475569" text-anchor="end" font-family="JetBrains Mono,monospace">-30</text>
+
+        <!-- X axis labels (GHz) -->
+        <text x="70"  y="340" font-size="10" fill="#475569" text-anchor="middle" font-family="JetBrains Mono,monospace">0.5</text>
+        <text x="230" y="340" font-size="10" fill="#475569" text-anchor="middle" font-family="JetBrains Mono,monospace">1.5</text>
+        <text x="390" y="340" font-size="10" fill="#475569" text-anchor="middle" font-family="JetBrains Mono,monospace">2.5</text>
+        <text x="550" y="340" font-size="10" fill="#475569" text-anchor="middle" font-family="JetBrains Mono,monospace">3.5</text>
+        <text x="710" y="340" font-size="10" fill="#475569" text-anchor="middle" font-family="JetBrains Mono,monospace">5.0</text>
+        <text x="870" y="340" font-size="10" fill="#475569" text-anchor="middle" font-family="JetBrains Mono,monospace">7.0</text>
+
+        <!-- Axis labels -->
+        <text x="470" y="365" font-size="12" fill="#64748b" text-anchor="middle" font-family="Inter,sans-serif" font-weight="500">频率 (GHz)</text>
+        <text x="16" y="175" font-size="12" fill="#64748b" text-anchor="middle" font-family="Inter,sans-serif" font-weight="500" transform="rotate(-90,16,175)">S11 (dB)</text>
+
+        <!-- ── Curve 1: Rectangular Patch, resonance at ~2.4 GHz → x≈294 ── -->
+        <!-- y=20 @ 0dB, y=320 @ -30dB → scale: 10 dB = 100px -->
+        <!-- at 0dB, y=20. at -2dB near wings, y=40. at -28dB peak dip, y=300 -->
+        <path id="curve1"
+          d="M70,22 C100,22 130,23 160,24 C180,25 200,26 220,27 C240,29 255,32 265,42 C272,52 276,65 280,90 C284,118 286,150 288,185 C290,220 291,255 292,280 C293,295 293.5,303 294,308 C294.5,312 295,314 296,315 C297,314 297.5,312 298,308 C298.5,303 299,295 300,280 C301,255 302,220 304,185 C306,150 308,118 312,90 C316,65 320,52 327,42 C337,32 352,29 372,27 C392,25 420,24 460,23 C530,22 600,21.5 700,21 C780,20.5 830,20.2 870,20"
+          stroke="#00d2ff" stroke-width="2.5" stroke-linecap="round" filter="url(#glowCyan)"
+          style="stroke-dasharray:2000;stroke-dashoffset:2000"/>
+
+        <!-- ── Curve 2: Dipole, resonance at ~1.8 GHz → x≈198 ── -->
+        <path id="curve2"
+          d="M70,22 C90,22 110,23 130,24 C150,25 160,27 170,33 C176,39 180,50 183,68 C186,90 187,118 188,148 C189,178 189.5,205 190,225 C190.5,242 191,254 192,262 C192.5,268 193,271 194,273 C194.5,271 195,268 195.5,262 C196.5,254 197,242 197.5,225 C198,205 199,178 200,148 C201,118 202,90 205,68 C208,50 212,39 218,33 C228,27 248,25 278,24 C330,23 420,22 520,21.5 C640,21 760,20.5 870,20"
+          stroke="#f97316" stroke-width="2.5" stroke-linecap="round" filter="url(#glowOrange)"
+          style="stroke-dasharray:2000;stroke-dashoffset:2000"/>
+
+        <!-- ── Curve 3: Pixel Patch, resonance at ~5.8 GHz → x≈726 ── -->
+        <path id="curve3"
+          d="M70,20.5 C150,20.5 250,21 350,21 C450,21.2 520,21.5 580,22 C620,22.5 650,23.5 670,25 C685,27 695,32 702,42 C707,52 710,68 712,92 C714,118 715,148 716,172 C716.5,188 717,202 718,212 C718.5,219 719,223 720,226 C720.5,228 721,229 722,230 C722.5,228 723,226 723.5,222 C724,218 724.5,210 725,198 C725.5,183 726,165 727,145 C728,122 729.5,100 731,80 C733,62 736,50 741,40 C748,30 758,25 775,23 C795,21.5 825,21 850,20.5 C860,20.3 865,20.2 870,20"
+          stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round" filter="url(#glowPurple)"
+          style="stroke-dasharray:2000;stroke-dashoffset:2000"/>
+
+        <!-- Resonance frequency markers -->
+        <line x1="294" y1="315" x2="294" y2="330" stroke="rgba(0,210,255,0.5)" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <text x="294" y="342" font-size="9" fill="rgba(0,210,255,0.7)" text-anchor="middle" font-family="JetBrains Mono,monospace">2.4 GHz</text>
+
+        <line x1="194" y1="273" x2="194" y2="330" stroke="rgba(249,115,22,0.5)" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <text x="194" y="342" font-size="9" fill="rgba(249,115,22,0.7)" text-anchor="middle" font-family="JetBrains Mono,monospace">1.8 GHz</text>
+
+        <line x1="722" y1="230" x2="722" y2="330" stroke="rgba(167,139,250,0.5)" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <text x="722" y="342" font-size="9" fill="rgba(167,139,250,0.7)" text-anchor="middle" font-family="JetBrains Mono,monospace">5.8 GHz</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<div class="gradient-div"></div>
+
+<!-- ────────────────────────── OPTIMIZER ────────────────────────── -->
+<section id="optimizer">
+  <div class="section-inner">
+    <p class="section-label reveal">优化算法</p>
+    <h2 class="section-title reveal reveal-delay-1">三种智能优化后端</h2>
+    <p class="section-desc reveal reveal-delay-2">ARIA 根据天线类型与优化维数自动推荐最佳算法，也支持手动切换。</p>
+    <div class="opt-cards">
+
+      <div class="opt-card reveal reveal-delay-1">
+        <div class="opt-header">
+          <div class="opt-icon-wrap">🔮</div>
+          <div>
+            <div class="opt-name">贝叶斯高斯过程</div>
+            <div class="opt-sub">Bayesian GP Optimization</div>
+          </div>
+        </div>
+        <div class="opt-rows">
+          <div>
+            <div class="opt-row"><span class="opt-row-label">适用场景</span><span class="opt-row-val" style="color:var(--cyan)">少样本 (&lt;50次)</span></div>
+          </div>
+          <div>
+            <div class="opt-row"><span class="opt-row-label">收敛速度</span><span class="opt-row-val">⚡⚡⚡</span></div>
+            <div class="opt-bar-wrap"><div class="opt-bar" style="width:90%"></div></div>
+          </div>
+          <div>
+            <div class="opt-row"><span class="opt-row-label">全局搜索性</span><span class="opt-row-val stars">★★★☆☆</span></div>
+            <div class="opt-bar-wrap"><div class="opt-bar" style="width:60%"></div></div>
+          </div>
+          <div>
+            <div class="opt-row"><span class="opt-row-label">参数维数</span><span class="opt-row-val" style="color:var(--text-muted)">低维 (2–8)</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="opt-card reveal reveal-delay-2">
+        <div class="opt-header">
+          <div class="opt-icon-wrap">🌀</div>
+          <div>
+            <div class="opt-name">粒子群优化</div>
+            <div class="opt-sub">Particle Swarm Optimization</div>
+          </div>
+        </div>
+        <div class="opt-rows">
+          <div>
+            <div class="opt-row"><span class="opt-row-label">适用场景</span><span class="opt-row-val" style="color:#a78bfa">中等维数</span></div>
+          </div>
+          <div>
+            <div class="opt-row"><span class="opt-row-label">收敛速度</span><span class="opt-row-val">⚡⚡</span></div>
+            <div class="opt-bar-wrap"><div class="opt-bar" style="width:66%"></div></div>
+          </div>
+          <div>
+            <div class="opt-row"><span class="opt-row-label">全局搜索性</span><span class="opt-row-val stars">★★★★☆</span></div>
+            <div class="opt-bar-wrap"><div class="opt-bar" style="width:80%"></div></div>
+          </div>
+          <div>
+            <div class="opt-row"><span class="opt-row-label">参数维数</span><span class="opt-row-val" style="color:var(--text-muted)">中维 (5–20)</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="opt-card reveal reveal-delay-3">
+        <div class="opt-header">
+          <div class="opt-icon-wrap">🧬</div>
+          <div>
+            <div class="opt-name">差分进化算法</div>
+            <div class="opt-sub">Differential Evolution GA</div>
+          </div>
+        </div>
+        <div class="opt-rows">
+          <div>
+            <div class="opt-row"><span class="opt-row-label">适用场景</span><span class="opt-row-val" style="color:var(--orange)">离散/高维</span></div>
+          </div>
+          <div>
+            <div class="opt-row"><span class="opt-row-label">收敛速度</span><span class="opt-row-val">⚡</span></div>
+            <div class="opt-bar-wrap"><div class="opt-bar" style="width:40%"></div></div>
+          </div>
+          <div>
+            <div class="opt-row"><span class="opt-row-label">全局搜索性</span><span class="opt-row-val stars">★★★★★</span></div>
+            <div class="opt-bar-wrap"><div class="opt-bar" style="width:100%"></div></div>
+          </div>
+          <div>
+            <div class="opt-row"><span class="opt-row-label">参数维数</span><span class="opt-row-val" style="color:var(--text-muted)">高维 (像素网格)</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="gradient-div"></div>
+
+<!-- ────────────────────────── QUICK START ────────────────────────── -->
+<section id="quickstart">
+  <div class="section-inner">
+    <p class="section-label reveal">快速开始</p>
+    <h2 class="section-title reveal reveal-delay-1">五分钟上手 ARIA</h2>
+    <p class="section-desc reveal reveal-delay-2">克隆项目，安装依赖，一键启动 Streamlit 可视化界面，开始你的天线 AI 之旅。</p>
+
+    <div class="terminal reveal reveal-delay-3">
+      <div class="terminal-bar">
+        <div class="t-dot"></div>
+        <div class="t-dot"></div>
+        <div class="t-dot"></div>
+        <div class="t-title">ARIA — 快速安装</div>
+      </div>
+      <div class="terminal-body">
+        <div class="t-line">
+          <span class="t-prompt">$</span>
+          <span class="t-cmd" id="tl1"></span>
+          <span class="t-cursor" id="tc1" style="display:none"></span>
+        </div>
+        <div class="t-line">
+          <span class="t-prompt">$</span>
+          <span class="t-cmd" id="tl2"></span>
+          <span class="t-cursor" id="tc2" style="display:none"></span>
+        </div>
+        <div class="t-line">
+          <span class="t-prompt">$</span>
+          <span class="t-cmd" id="tl3"></span>
+          <span class="t-cursor" id="tc3" style="display:none"></span>
+        </div>
+        <div class="t-output" id="toutput1" style="opacity:0">✓ Successfully installed aria-antenna-ai</div>
+        <div class="t-line">
+          <span class="t-prompt">$</span>
+          <span class="t-cmd" id="tl4"></span>
+          <span class="t-cursor" id="tc4" style="display:none"></span>
+        </div>
+        <div class="t-output" id="toutput2" style="opacity:0;color:#28c840">
+          &nbsp;&nbsp;You can now view ARIA in your browser.<br>
+          &nbsp;&nbsp;Local URL: <span style="color:var(--cyan)">http://localhost:8501</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="gradient-div"></div>
+
+<!-- ────────────────────────── FOOTER ────────────────────────── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">📡 ARIA</div>
+    <p style="font-size:0.95rem; color:var(--text-muted); margin-bottom:0.4rem; font-weight:600;">Antenna Resonance Intelligence Architect</p>
+    <p class="footer-tagline">由 <strong style="color:var(--text-muted)">尤栖冲 (You Xichong)</strong> 创建 · 基于 CST Studio Suite 2022 + Claude AI</p>
+    <div class="footer-links">
+      <a href="https://github.com/youxch/ARIA" class="footer-link" target="_blank">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+        GitHub
+      </a>
+      <a href="#features" class="footer-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        文档
+      </a>
+      <a href="mailto:youxch@example.com" class="footer-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        联系作者
+      </a>
+    </div>
+    <!-- 访问统计 -->
+    <div style="display:flex;justify-content:center;align-items:center;gap:2rem;
+      margin:1.2rem 0 1.5rem;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:.5rem;
+        background:rgba(0,210,255,.06);border:1px solid rgba(0,210,255,.15);
+        border-radius:999px;padding:.35rem 1.1rem;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00d2ff"
+          stroke-width="2" style="flex-shrink:0">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+        <span style="font-size:.78rem;color:#475569;font-weight:500;">总访问量</span>
+        <span id="busuanzi_value_site_pv"
+          style="font-size:.9rem;font-weight:700;color:#00d2ff;min-width:2rem;text-align:center;">
+          …
+        </span>
+        <span style="font-size:.78rem;color:#475569;">次</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:.5rem;
+        background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.15);
+        border-radius:999px;padding:.35rem 1.1rem;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed"
+          stroke-width="2" style="flex-shrink:0">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+        <span style="font-size:.78rem;color:#475569;font-weight:500;">独立访客</span>
+        <span id="busuanzi_value_site_uv"
+          style="font-size:.9rem;font-weight:700;color:#7c3aed;min-width:2rem;text-align:center;">
+          …
+        </span>
+        <span style="font-size:.78rem;color:#475569;">人</span>
+      </div>
+    </div>
+
+    <p class="footer-copy">© <span>2026</span> ARIA Project · <span>尤栖冲</span> · MIT License</p>
+  </div>
+</footer>
+
+
+<!-- ══════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════ -->
+<script>
+/* ── 1. WAVE CANVAS ── */
+(function(){
+  const canvas = document.getElementById('waveCanvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, raf;
+  let t = 0;
+
+  const waves = [
+    { amp: 28, freq: 0.008, speed: 0.6, color: 'rgba(0,210,255,', opacity: 0.18, yRatio: 0.35, thick: 1.5 },
+    { amp: 20, freq: 0.012, speed: 0.9, color: 'rgba(124,58,237,', opacity: 0.14, yRatio: 0.5,  thick: 1.2 },
+    { amp: 35, freq: 0.005, speed: 0.4, color: 'rgba(0,210,255,', opacity: 0.08, yRatio: 0.65, thick: 2 },
+    { amp: 18, freq: 0.018, speed: 1.2, color: 'rgba(249,115,22,', opacity: 0.10, yRatio: 0.42, thick: 1 },
+    { amp: 25, freq: 0.009, speed: 0.7, color: 'rgba(124,58,237,', opacity: 0.12, yRatio: 0.58, thick: 1.5 },
+    { amp: 14, freq: 0.022, speed: 1.5, color: 'rgba(0,210,255,', opacity: 0.06, yRatio: 0.75, thick: 1 },
+  ];
+
+  function resize(){
+    W = canvas.width = canvas.offsetWidth;
+    H = canvas.height = canvas.offsetHeight;
+  }
+
+  function draw(){
+    ctx.clearRect(0, 0, W, H);
+    t += 0.012;
+
+    waves.forEach(w => {
+      ctx.beginPath();
+      ctx.strokeStyle = w.color + w.opacity + ')';
+      ctx.lineWidth = w.thick;
+      const baseY = H * w.yRatio;
+      for(let x = 0; x <= W; x += 2){
+        const y = baseY + Math.sin((x * w.freq) - (t * w.speed * 10)) * w.amp;
+        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    });
+
+    raf = requestAnimationFrame(draw);
+  }
+
+  resize();
+  window.addEventListener('resize', resize);
+  draw();
+})();
+
+/* ── 2. SCROLL REVEAL (Intersection Observer) ── */
+(function(){
+  const els = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if(e.isIntersecting){ e.target.classList.add('visible'); }
+    });
+  }, { threshold: 0.12 });
+  els.forEach(el => obs.observe(el));
+})();
+
+/* ── 3. HERO S11 DRAW ANIMATION ── */
+(function(){
+  const path = document.getElementById('heroS11Path');
+  let triggered = false;
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if(e.isIntersecting && !triggered){
+        triggered = true;
+        path.style.transition = 'stroke-dashoffset 2.2s cubic-bezier(.4,0,.2,1)';
+        path.style.strokeDashoffset = '0';
+      }
+    });
+  }, { threshold: 0.3 });
+  obs.observe(path.closest('svg'));
+})();
+
+/* ── 4. S11 CHART DRAW ANIMATION ── */
+(function(){
+  const curves = ['curve1','curve2','curve3'];
+  let triggered = false;
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if(e.isIntersecting && !triggered){
+        triggered = true;
+        curves.forEach((id, i) => {
+          const p = document.getElementById(id);
+          if(!p) return;
+          setTimeout(() => {
+            p.style.transition = 'stroke-dashoffset 2s cubic-bezier(.4,0,.2,1)';
+            p.style.strokeDashoffset = '0';
+          }, i * 400);
+        });
+      }
+    });
+  }, { threshold: 0.2 });
+  const chart = document.getElementById('s11Chart');
+  if(chart) obs.observe(chart);
+})();
+
+/* ── 5. TERMINAL TYPEWRITER ── */
+(function(){
+  const lines = [
+    { id:'tl1', cursor:'tc1', text:'git clone https://github.com/youxch/ARIA', outId: null },
+    { id:'tl2', cursor:'tc2', text:'cd ARIA', outId: null },
+    { id:'tl3', cursor:'tc3', text:'pip install -r requirements.txt', outId: 'toutput1' },
+    { id:'tl4', cursor:'tc4', text:'streamlit run app.py', outId: 'toutput2' },
+  ];
+
+  let triggered = false;
+
+  function typeLines(lineIdx, charIdx){
+    if(lineIdx >= lines.length) return;
+    const line = lines[lineIdx];
+    const el = document.getElementById(line.id);
+    const cursor = document.getElementById(line.cursor);
+
+    if(charIdx === 0) cursor.style.display = 'inline-block';
+
+    if(charIdx < line.text.length){
+      el.textContent += line.text[charIdx];
+      setTimeout(() => typeLines(lineIdx, charIdx + 1), 38 + Math.random() * 25);
+    } else {
+      cursor.style.display = 'none';
+      if(line.outId){
+        const out = document.getElementById(line.outId);
+        if(out) setTimeout(() => { out.style.transition = 'opacity 0.4s'; out.style.opacity = '1'; }, 400);
+      }
+      setTimeout(() => typeLines(lineIdx + 1, 0), line.outId ? 900 : 320);
+    }
+  }
+
+  const terminal = document.querySelector('.terminal');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if(e.isIntersecting && !triggered){
+        triggered = true;
+        setTimeout(() => typeLines(0, 0), 300);
+      }
+    });
+  }, { threshold: 0.4 });
+  if(terminal) obs.observe(terminal);
+})();
+
+/* ── 6. SMOOTH NAV LINKS ── */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const id = a.getAttribute('href').slice(1);
+    const el = document.getElementById(id);
+    if(el){ e.preventDefault(); el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  });
+});
+
+/* ── 7. NAV ACTIVE STATE ── */
+(function(){
+  const nav = document.querySelector('nav');
+  window.addEventListener('scroll', () => {
+    if(window.scrollY > 60){
+      nav.style.background = 'rgba(5,13,26,0.95)';
+    } else {
+      nav.style.background = 'rgba(5,13,26,0.8)';
+    }
+  }, { passive: true });
+})();
+</script>
+
+</body>
+</html>
